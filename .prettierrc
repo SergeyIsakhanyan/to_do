@@ -1,0 +1,13 @@
+{
+    "singleQuote": true,
+    "strict": [2, "never"],
+    "semi": false,
+    "react/jsx-uses-react": 2,
+    "react/jsx-uses-vars": 2,
+    "react/react-in-jsx-scope": 2,
+    "react/jsx-no-duplicate-props": 2,
+    "printWidth": 110,
+    "trailingComma": "none",
+    "arrowParens": "avoid"
+  }
+  
