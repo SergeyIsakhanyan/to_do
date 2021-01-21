@@ -24,6 +24,8 @@ function hideError() {
   error.innerHTML = ''
 }
 
+//commented
+
 function addToDo() {
   var item = document.createElement('li')
   var id = 'todo-item-id_'
