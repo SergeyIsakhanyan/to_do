@@ -56,9 +56,9 @@ function createCheckboxEl(generatedId) {
 function onCheckboxChange(event, generatedId) {
   let item = document.getElementById('todo-item-id_' + generatedId)
   if (event.target.checked == true) {
-    item.setAttribute('class', 'completed')
+    item.setAttribute('class', 'todo-item completed')
   } else {
-    item.setAttribute('class', 'incompleted')
+    item.setAttribute('class', 'todo-item')
   }
   console.log(item, event.target.id, event.target.checked, generatedId, 'todo-item-id_' + generatedId)
 }
@@ -107,4 +107,12 @@ var generateId = function () {
   return id
 }
 
+function clearTodos() {
+  var list = document.getElementById('todo-items')
+  while (list.firstChild) {
+    list.removeChild(list.firstChild)
+  }
+}
+
 document.getElementById('btn-submit').addEventListener('click', validate, false)
+document.getElementById('clear-todos').addEventListener('click', clearTodos, false)

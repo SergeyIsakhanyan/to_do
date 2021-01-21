@@ -175,9 +175,9 @@ a {
 }
 
 .completed {
-  padding: 10px;
-  margin: 20px;
-  background: blanchedalmond;
+  text-decoration: line-through;
+  font-style: italic;
+  color: #d6d6d6;
 }
 
 .incompleted {
