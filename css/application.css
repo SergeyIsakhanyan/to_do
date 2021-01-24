@@ -145,14 +145,17 @@ a {
 
 #clear-todos:focus {
   color: crimson;
+  transition-duration: 0s;
 }
 
 #clear-todos:hover {
   color: crimson;
+  transition-duration: 1s;
 }
 
 #clear-todos:active {
   color: white;
+  transition-duration: 0s;
 }
 
 .container--error {
@@ -177,7 +180,7 @@ a {
 .completed {
   text-decoration: line-through;
   font-style: italic;
-  color: #d6d6d6;
+  color: #3a0000;
 }
 
 .incompleted {

@@ -1,6 +1,17 @@
 var inputItem = document.getElementById('todo-add-new')
 var list = document.getElementById('todo-items')
 var error = document.getElementById('error')
+getValuesFromLockalStorage()
+
+function getValuesFromLockalStorage() {
+  let storageData = localStorage.getItem('list')
+  storageData = JSON.parse(storageData)
+  if (storageData) {
+    for (const key in storageData) {
+      addToDo(key, storageData[key])
+    }
+  }
+}
 
 function validate(e) {
   e.preventDefault()
@@ -18,19 +29,22 @@ function removeItem(e) {
   console.log(id, dataId)
   var liElement = document.getElementById('todo-item-id_' + dataId)
   list.removeChild(liElement)
+  removeValueFromLocalStorage(dataId)
 }
 
 function hideError() {
   error.innerHTML = ''
 }
 
-function addToDo() {
+function addToDo(storageId, storageValue) {
   var item = document.createElement('li')
   var id = 'todo-item-id_'
-  var generatedId = generateId()
+  var generatedId = storageId || generateId()
+  var value = storageValue || inputItem.value
+
   var checkBoxEl = createCheckboxEl(generatedId)
 
-  var label = createLabelEl(inputItem.value)
+  var label = createLabelEl(value)
   var removeBtn = createRemoveBtnEl(generatedId)
 
   item.appendChild(checkBoxEl)
@@ -41,7 +55,35 @@ function addToDo() {
   item.setAttribute('id', id + generatedId)
 
   list.appendChild(item)
+
+  setValueToLocalStorage(value, generatedId)
+
   inputItem.value = ''
+}
+
+function setValueToLocalStorage(value, generatedId) {
+  let storageData = localStorage.getItem('list')
+  console.log(storageData, typeof storageData)
+  if (storageData) {
+    storageData = JSON.parse(storageData)
+    storageData[generatedId] = value
+  } else {
+    storageData = { [generatedId]: value }
+  }
+  localStorage.setItem('list', JSON.stringify(storageData))
+}
+
+function removeValueFromLocalStorage(generatedId) {
+  let storageData = localStorage.getItem('list')
+  storageData = JSON.parse(storageData)
+  if (storageData) {
+    delete storageData[generatedId]
+    localStorage.setItem('list', JSON.stringify(storageData))
+  }
+}
+
+function removeValuseFromLocalStorage() {
+  localStorage.removeItem('list')
 }
 
 function createCheckboxEl(generatedId) {
@@ -112,6 +154,7 @@ function clearTodos() {
   while (list.firstChild) {
     list.removeChild(list.firstChild)
   }
+  removeValuseFromLocalStorage()
 }
 
 document.getElementById('btn-submit').addEventListener('click', validate, false)
