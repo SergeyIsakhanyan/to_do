@@ -1,17 +1,28 @@
 var inputItem = document.getElementById('todo-add-new')
 var list = document.getElementById('todo-items')
 var error = document.getElementById('error')
-getValuesFromLockalStorage()
+getValuesFromLocalStorage()
 
-function getValuesFromLockalStorage() {
+function getValuesFromLocalStorage() {
   let storageData = localStorage.getItem('list')
   storageData = JSON.parse(storageData)
   if (storageData) {
     for (const key in storageData) {
-      addToDo(key, storageData[key])
+      addToDo(key, storageData[key]) // string -> object
     }
   }
 }
+
+// const obj = {
+//   //key: 'value', // key can be: 'name', 'age', 'isAdmin'
+//   name: 'Gago',
+//   age: 45
+// }
+
+// for (const key in obj) {
+//   console.log('key is:', key) // 1. name, 2. age
+//   console.log('value is:', obj[key]) // 1. obj.name, 2. obj.age
+// }
 
 function validate(e) {
   e.preventDefault()
@@ -23,10 +34,8 @@ function validate(e) {
 }
 
 function removeItem(e) {
-  var id = e.target.id
   var clickedBtn = e.target
   var dataId = clickedBtn.getAttribute('data-id')
-  console.log(id, dataId)
   var liElement = document.getElementById('todo-item-id_' + dataId)
   list.removeChild(liElement)
   removeValueFromLocalStorage(dataId)
@@ -36,13 +45,15 @@ function hideError() {
   error.innerHTML = ''
 }
 
-function addToDo(storageId, storageValue) {
+function addToDo(storageId, storageValueObj = {}) {
+  // storageId-ին կարող է լինել կամ id կամ undefined. these two arguments are optional
   var item = document.createElement('li')
   var id = 'todo-item-id_'
   var generatedId = storageId || generateId()
-  var value = storageValue || inputItem.value
+  var value = storageValueObj.value || inputItem.value
+  var isChecked = !!storageValueObj.status
 
-  var checkBoxEl = createCheckboxEl(generatedId)
+  var checkBoxEl = createCheckboxEl(generatedId, isChecked) // status is boolean
 
   var label = createLabelEl(value)
   var removeBtn = createRemoveBtnEl(generatedId)
@@ -51,26 +62,42 @@ function addToDo(storageId, storageValue) {
   item.appendChild(label)
   item.appendChild(removeBtn)
 
-  item.setAttribute('class', 'todo-item')
+  if (storageValueObj.status) {
+    item.setAttribute('class', 'todo-item completed')
+  } else {
+    item.setAttribute('class', 'todo-item')
+  }
+
   item.setAttribute('id', id + generatedId)
 
   list.appendChild(item)
 
-  setValueToLocalStorage(value, generatedId)
+  if (!storageId) {
+    setValueToLocalStorage({ value: value, status: isChecked }, generatedId)
+  }
 
   inputItem.value = ''
 }
 
-function setValueToLocalStorage(value, generatedId) {
-  let storageData = localStorage.getItem('list')
-  console.log(storageData, typeof storageData)
+function setValueToLocalStorage(obj, generatedId) {
+  let storageData = localStorage.getItem('list') // returns JSON string or null
+
   if (storageData) {
-    storageData = JSON.parse(storageData)
-    storageData[generatedId] = value
+    storageData = JSON.parse(storageData) // parsing to make object
+    storageData[generatedId] = obj // adding new property to object
   } else {
-    storageData = { [generatedId]: value }
+    storageData = { [generatedId]: obj } // assinging new object with property
   }
   localStorage.setItem('list', JSON.stringify(storageData))
+}
+
+function changeItemStatus(isChecked, generatedId) {
+  let storageData = localStorage.getItem('list') // returns JSON string or null
+  if (storageData) {
+    storageData = JSON.parse(storageData)
+    storageData[generatedId] = { value: storageData[generatedId].value, status: isChecked }
+    localStorage.setItem('list', JSON.stringify(storageData))
+  }
 }
 
 function removeValueFromLocalStorage(generatedId) {
@@ -86,23 +113,29 @@ function removeValuseFromLocalStorage() {
   localStorage.removeItem('list')
 }
 
-function createCheckboxEl(generatedId) {
+function createCheckboxEl(generatedId, isChecked) {
   var input = document.createElement('input')
   var idCheckbox = 'idCheckbox_'
   input.setAttribute('type', 'checkbox')
   input.setAttribute('id', idCheckbox + generatedId)
+  if (isChecked) {
+    input.setAttribute('checked', isChecked)
+  }
+
   input.addEventListener('change', event => onCheckboxChange(event, generatedId), false)
   return input
 }
 
 function onCheckboxChange(event, generatedId) {
+  const isChecked = event.target.checked
   let item = document.getElementById('todo-item-id_' + generatedId)
-  if (event.target.checked == true) {
+  if (isChecked) {
     item.setAttribute('class', 'todo-item completed')
   } else {
     item.setAttribute('class', 'todo-item')
   }
-  console.log(item, event.target.id, event.target.checked, generatedId, 'todo-item-id_' + generatedId)
+
+  changeItemStatus(isChecked, generatedId)
 }
 
 function createRemoveBtnEl(generatedId) {
